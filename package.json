@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build"
+  },
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "eleventy-plugin-theme-ui",
+  "author": "James Edmonds",
+  "module": "dist/eleventy-plugin-theme-ui.esm.js",
+  "devDependencies": {
+    "@11ty/eleventy": "^0.11.0",
+    "husky": "^4.2.5",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.6"
+  },
+  "dependencies": {
+    "@theme-ui/css": "^0.3.1",
+    "@types/jsdom": "^16.2.3",
+    "@types/theme-ui": "^0.3.5",
+    "create-emotion-server": "^10.0.27",
+    "emotion": "^10.0.27",
+    "jsdom": "^16.3.0",
+    "json5": "^2.1.3"
+  }
+}
