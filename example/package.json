@@ -1,6 +1,7 @@
 {
   "name": "example",
   "scripts": {
+    "start": "eleventy --serve",
     "build": "eleventy"
   },
   "devDependencies": {

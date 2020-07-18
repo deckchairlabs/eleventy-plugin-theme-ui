@@ -1,5 +1,5 @@
 const pluginThemeUI = require('../').default
-const theme = require('@theme-ui/preset-base').default
+const theme = require('./theme')
 
 module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(pluginThemeUI, {
