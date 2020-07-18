@@ -78,11 +78,13 @@ export default function plugin(
         const cssAttribute = element.getAttribute(CSS_ATTRIBUTE);
         const variantAttribute = element.getAttribute(VARIANT_ATTRIBUTE);
 
-        const sxValue = sxAttribute ? JSON5.parse(sxAttribute.valueOf()) : {};
-        const cssValue = cssAttribute
+        const sxAttributeValue = sxAttribute
+          ? JSON5.parse(sxAttribute.valueOf())
+          : {};
+        const cssAttributeValue = cssAttribute
           ? JSON5.parse(cssAttribute.valueOf())
           : {};
-        const variantValue = variantAttribute
+        const variantAttributeValue = variantAttribute
           ? variantAttribute.valueOf()
           : undefined;
 
@@ -92,10 +94,10 @@ export default function plugin(
 
         const className = applyStyles(
           {
-            variant: variantValue,
-            ...sxValue,
+            variant: variantAttributeValue,
+            ...sxAttributeValue,
           },
-          cssValue
+          cssAttributeValue
         );
 
         if (className) {
