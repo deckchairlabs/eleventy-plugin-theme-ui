@@ -70,7 +70,7 @@ export default function plugin(
 
       const initialDOM = new JSDOM(content);
       const elements = initialDOM.window.document.querySelectorAll(
-        '[sx], [css], [variant]'
+        `[${SX_ATTRIBUTE}], [${CSS_ATTRIBUTE}], [${VARIANT_ATTRIBUTE}]`
       );
 
       elements.forEach(element => {
