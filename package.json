@@ -30,6 +30,10 @@
     "trailingComma": "es5"
   },
   "name": "eleventy-plugin-theme-ui",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/deckchairlabs/eleventy-plugin-theme-ui"
+  },
   "author": "James Edmonds",
   "module": "dist/eleventy-plugin-theme-ui.esm.js",
   "devDependencies": {
