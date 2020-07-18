@@ -1,4 +1,4 @@
-# eleventy-theme-ui-plugin (alpha)
+# eleventy-plugin-theme-ui (alpha)
 
 An [11ty](https://www.11ty.dev/) plugin allowing the use of [ThemeUI](https://theme-ui.com/) within your templates.
 
