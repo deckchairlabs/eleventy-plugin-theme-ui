@@ -11,4 +11,11 @@ module.exports = function (eleventyConfig) {
     Object.keys(transforms).forEach((transformName) => {
         eleventyConfig.addTransform(transformName, transforms[transformName])
     })
+
+    return {
+        templateFormats: ['njk', 'md'],
+        htmlTemplateEngine: 'njk',
+        markdownTemplateEngine: 'njk',
+        passthroughFileCopy: true
+    }
 };

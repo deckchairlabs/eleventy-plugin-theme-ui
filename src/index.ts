@@ -1,6 +1,7 @@
 import emotion from 'emotion';
 import JSON5 from 'json5';
 import { JSDOM } from 'jsdom';
+import MarkdownIt from 'markdown-it';
 import createEmotionServer from 'create-emotion-server';
 //@ts-ignore
 import { css as cssx, get } from '@theme-ui/css';
@@ -24,6 +25,28 @@ export default function plugin(
   options: Options = defaultOptions
 ) {
   const { theme } = options;
+
+  const markdown = new MarkdownIt({
+    html: true,
+    breaks: true,
+    linkify: true,
+    typographer: true,
+  });
+
+  const originalRenderAttrs = markdown.renderer.renderAttrs;
+  markdown.renderer.renderAttrs = function renderAttrs(token) {
+    if (token.tag) {
+      const styleVariant: string = `styles.${token.tag}`;
+      const className = applyStyles({ variant: styleVariant });
+
+      if (className) {
+        token.attrJoin('class', className);
+      }
+    }
+    return originalRenderAttrs(token);
+  };
+
+  eleventyConfig.setLibrary('md', markdown);
 
   function applyStyles(
     sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string },
