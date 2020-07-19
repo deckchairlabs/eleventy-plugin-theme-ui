@@ -8,22 +8,31 @@ import { SystemStyleObject, UseThemeFunction } from '@styled-system/css';
 import { Theme } from 'theme-ui';
 
 type Options = {
-  theme: Theme;
-};
-
-const defaultOptions: Options = {
-  theme: {},
+  themePath: string;
 };
 
 const SX_ATTRIBUTE = 'sx';
 const CSS_ATTRIBUTE = 'css';
 const VARIANT_ATTRIBUTE = 'variant';
 
+let theme: Theme;
+
 export default function plugin(
   eleventyConfig: any,
-  options: Options = defaultOptions
+  options: Partial<Options> = {}
 ) {
-  const { theme } = options;
+  const { themePath } = options;
+
+  if (!themePath) {
+    throw new Error('No themePath was specified.');
+  }
+
+  const resolvedThemePath = require.resolve(themePath, {
+    paths: [process.cwd()],
+  });
+
+  eleventyConfig.addWatchTarget(resolvedThemePath);
+  theme = require(resolvedThemePath);
 
   function applyStyles(
     sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string },
@@ -44,6 +53,11 @@ export default function plugin(
 
     return undefined;
   }
+
+  eleventyConfig.on('beforeWatch', function() {
+    delete require.cache[resolvedThemePath];
+    theme = require(resolvedThemePath);
+  });
 
   eleventyConfig.addTransform('theme-ui', function(
     content: string,
