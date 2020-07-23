@@ -10,8 +10,15 @@
       color: 'white'
     } %}">
       Hello world!
-      <button class="{% sx { variant: 'buttons.primary' } %}">Primary Button</button>
-      <button class="{% sx { variant: 'buttons.secondary' } %}">Secondary Button</button>
+      <button class="{% variant 'buttons.primary' %}">Primary Button</button>
+      <button class="{% variant 'buttons.secondary' %}">Secondary Button</button>
+      {% Button variant="primary" %}
+        Primary Button
+      {% endButton %}
+
+      {% Box id="box" %}
+        Box
+      {% endBox %}
     </main>
   </body>
 </html>

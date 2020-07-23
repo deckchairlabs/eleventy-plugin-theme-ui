@@ -3,9 +3,10 @@ import { JSDOM } from 'jsdom';
 import MarkdownIt from 'markdown-it';
 import createEmotionServer from 'create-emotion-server';
 //@ts-ignore
-import { css as cssx, get } from '@theme-ui/css';
-import { SystemStyleObject, UseThemeFunction } from '@styled-system/css';
+import { css as themedCss } from '@theme-ui/css';
 import { Theme } from 'theme-ui';
+import { css, SxProp } from './css';
+import * as components from './components';
 
 type Options = {
   theme: Theme;
@@ -15,61 +16,45 @@ const defaultOptions: Options = {
   theme: {},
 };
 
-export function applyStyles(
-  sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string },
-  css = {},
-  theme: Theme
-) {
-  if (sx) {
-    const { variant, ...baseStyles } = sx;
-    const variantStyles = cssx(get(theme, variant))({ theme });
-
-    const mergedStyles = {
-      ...variantStyles,
-      ...cssx(baseStyles)({ theme }),
-      ...css,
-    };
-
-    return emotion.css(mergedStyles);
-  }
-
-  return undefined;
-}
-
 export default function plugin(
   eleventyConfig: any,
   options: Options = defaultOptions
 ) {
   const { theme } = options;
 
-  const markdown = new MarkdownIt({
-    html: true,
-    breaks: true,
-    linkify: true,
-    typographer: true,
+  /**
+   * Universal Shortcodes
+   */
+  eleventyConfig.addShortcode('sx', function(sx: SxProp) {
+    return css(sx, theme);
   });
 
-  const originalRenderAttrs = markdown.renderer.renderAttrs;
-  markdown.renderer.renderAttrs = function renderAttrs(token) {
-    if (token.tag) {
-      const styleVariant: string = `styles.${token.tag}`;
-      const className = applyStyles({ variant: styleVariant }, {}, theme);
+  eleventyConfig.addShortcode('variant', function(variant: string) {
+    return css({ variant }, theme);
+  });
 
-      if (className) {
-        token.attrJoin('class', className);
-      }
-    }
-    return originalRenderAttrs(token);
-  };
-
-  eleventyConfig.setLibrary('md', markdown);
-
-  eleventyConfig.addShortcode('sx', function(
-    sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string }
+  /**
+   * Component shortcodes
+   */
+  eleventyConfig.addPairedShortcode('Box', function(
+    children: string,
+    props: any
   ) {
-    return applyStyles(sx, {}, theme);
+    return components.Box(children, { theme, ...props });
   });
 
+  eleventyConfig.addPairedShortcode('Button', function(
+    children: string,
+    props: any
+  ) {
+    return components.Button(children, { theme, ...props });
+  });
+
+  /**
+   * ThemeUI Transformer
+   *
+   * Extract the generated emotion style tags and append them to the document head.
+   */
   eleventyConfig.addTransform('theme-ui', function(
     content: string,
     outputPath: string
@@ -81,7 +66,7 @@ export default function plugin(
           theme.useBorderBox === false ? undefined : 'border-box';
         // Inject global styles
         emotion.injectGlobal(
-          cssx({
+          themedCss({
             '*': {
               boxSizing,
             },
@@ -94,12 +79,14 @@ export default function plugin(
       }
 
       const emotionServer = createEmotionServer(emotion.cache);
-      const { html, css } = emotionServer.extractCritical(content);
+      const { html, css: extractedStyles } = emotionServer.extractCritical(
+        content
+      );
 
       const newDOM = new JSDOM(html);
 
       const styleTag = newDOM.window.document.createElement('style');
-      styleTag.innerHTML = css;
+      styleTag.innerHTML = extractedStyles;
 
       newDOM.window.document.head.append(styleTag);
 
@@ -108,4 +95,31 @@ export default function plugin(
 
     return content;
   });
+
+  /**
+   * Markdown It renderer patch for renderAttrs
+   */
+  const markdown = new MarkdownIt({
+    html: true,
+    breaks: true,
+    linkify: true,
+    typographer: true,
+  });
+
+  const originalRenderAttrs = markdown.renderer.renderAttrs;
+  markdown.renderer.renderAttrs = function renderAttrs(token) {
+    if (token.tag) {
+      const className = css(
+        { __themeKey: 'styles', variant: token.tag },
+        theme
+      );
+
+      if (className) {
+        token.attrJoin('class', className);
+      }
+    }
+    return originalRenderAttrs(token);
+  };
+
+  eleventyConfig.setLibrary('md', markdown);
 }
