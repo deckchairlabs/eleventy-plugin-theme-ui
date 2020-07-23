@@ -10,9 +10,15 @@ export type BoxProps = {
 
 export function Box(children: string, props: BoxProps) {
   const { theme, as = 'div', variant, sx, ...htmlAttributes } = props;
-  const className = css({ variant, ...sx }, theme);
 
-  console.log(htmlAttributes);
+  const className = css(
+    {
+      variant,
+      label: 'Box',
+      ...sx,
+    },
+    theme
+  );
 
   const attributes = Object.entries(htmlAttributes)
     .map(([attribute, value]) => {

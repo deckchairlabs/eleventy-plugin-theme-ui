@@ -2,6 +2,7 @@ import { Box, BoxProps } from './Box';
 import { SxProp } from '../css';
 
 const defaultStyles: SxProp = {
+  label: 'Button',
   appearance: 'none',
   display: 'inline-block',
   textAlign: 'center',
