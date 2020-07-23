@@ -12,15 +12,15 @@ export type BoxProps = {
   sx?: SxProp;
 };
 
-export function Box({ children, ...props }: BoxProps) {
-  const {
-    theme,
-    as = 'div',
-    sx,
-    variant,
-    __themeKey,
-    ...htmlAttributes
-  } = props;
+export function Box({
+  children,
+  as = 'div',
+  theme,
+  __themeKey,
+  variant,
+  ...props
+}: BoxProps) {
+  const { sx, ...htmlAttributes } = props;
 
   const variantStyles = themedCss(
     get(theme, __themeKey + '.' + variant, get(theme, variant))
@@ -40,6 +40,7 @@ export function Box({ children, ...props }: BoxProps) {
       if (attribute === '__keywords') {
         return;
       }
+      value = value === true ? attribute : value;
       return `${attribute}="${String(value)}"`;
     })
     .filter(Boolean)
