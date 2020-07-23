@@ -1,5 +1,4 @@
 import emotion from 'emotion';
-import JSON5 from 'json5';
 import { JSDOM } from 'jsdom';
 import MarkdownIt from 'markdown-it';
 import createEmotionServer from 'create-emotion-server';
@@ -15,10 +14,6 @@ type Options = {
 const defaultOptions: Options = {
   theme: {},
 };
-
-const SX_ATTRIBUTE = 'sx';
-const CSS_ATTRIBUTE = 'css';
-const VARIANT_ATTRIBUTE = 'variant';
 
 export function applyStyles(
   sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string },
@@ -69,6 +64,12 @@ export default function plugin(
 
   eleventyConfig.setLibrary('md', markdown);
 
+  eleventyConfig.addShortcode('sx', function(
+    sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string }
+  ) {
+    return applyStyles(sx, {}, theme);
+  });
+
   eleventyConfig.addTransform('theme-ui', function(
     content: string,
     outputPath: string
@@ -92,48 +93,8 @@ export default function plugin(
         );
       }
 
-      const initialDOM = new JSDOM(content);
-      const elements = initialDOM.window.document.querySelectorAll(
-        `[${SX_ATTRIBUTE}], [${CSS_ATTRIBUTE}], [${VARIANT_ATTRIBUTE}]`
-      );
-
-      elements.forEach(element => {
-        const sxAttribute = element.getAttribute(SX_ATTRIBUTE);
-        const cssAttribute = element.getAttribute(CSS_ATTRIBUTE);
-        const variantAttribute = element.getAttribute(VARIANT_ATTRIBUTE);
-
-        const sxAttributeValue = sxAttribute
-          ? JSON5.parse(sxAttribute.valueOf())
-          : {};
-        const cssAttributeValue = cssAttribute
-          ? JSON5.parse(cssAttribute.valueOf())
-          : {};
-        const variantAttributeValue = variantAttribute
-          ? variantAttribute.valueOf()
-          : undefined;
-
-        element.removeAttribute(SX_ATTRIBUTE);
-        element.removeAttribute(CSS_ATTRIBUTE);
-        element.removeAttribute(VARIANT_ATTRIBUTE);
-
-        const className = applyStyles(
-          {
-            variant: variantAttributeValue,
-            ...sxAttributeValue,
-          },
-          cssAttributeValue,
-          theme
-        );
-
-        if (className) {
-          element.className = className;
-        }
-      });
-
       const emotionServer = createEmotionServer(emotion.cache);
-      const { html, css } = emotionServer.extractCritical(
-        initialDOM.serialize()
-      );
+      const { html, css } = emotionServer.extractCritical(content);
 
       const newDOM = new JSDOM(html);
 

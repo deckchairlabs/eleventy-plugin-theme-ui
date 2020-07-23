@@ -32,14 +32,16 @@ module.exports = function(eleventyConfig) {
 
 ## Usage
 
-You can use the special `sx, css, variant` HTML attributes within any of the 11ty supported template languages.
+You can now use the `sx` shortcode within any of the 11ty shortcode supported template languages.
 
 ```html
-<div sx="{ padding: 3, backgroundColor: 'primary', fontSize: [1, 4] }">
+<div
+  class="{% sx { padding: 3, backgroundColor: 'primary', fontSize: [1, 4] } %}"
+>
   Hello world
 </div>
 
-<button variant="buttons.primary">Primary Button</button>
+<button class="{% sx { variant: 'buttons.primary' } %}">Primary Button</button>
 ```
 
 ## Local Development
