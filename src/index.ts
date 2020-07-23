@@ -1,6 +1,7 @@
 import emotion from 'emotion';
 import JSON5 from 'json5';
 import { JSDOM } from 'jsdom';
+import MarkdownIt from 'markdown-it';
 import createEmotionServer from 'create-emotion-server';
 //@ts-ignore
 import { css as cssx, get } from '@theme-ui/css';
@@ -19,31 +20,54 @@ const SX_ATTRIBUTE = 'sx';
 const CSS_ATTRIBUTE = 'css';
 const VARIANT_ATTRIBUTE = 'variant';
 
+export function applyStyles(
+  sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string },
+  css = {},
+  theme: Theme
+) {
+  if (sx) {
+    const { variant, ...baseStyles } = sx;
+    const variantStyles = cssx(get(theme, variant))({ theme });
+
+    const mergedStyles = {
+      ...variantStyles,
+      ...cssx(baseStyles)({ theme }),
+      ...css,
+    };
+
+    return emotion.css(mergedStyles);
+  }
+
+  return undefined;
+}
+
 export default function plugin(
   eleventyConfig: any,
   options: Options = defaultOptions
 ) {
   const { theme } = options;
 
-  function applyStyles(
-    sx: Exclude<SystemStyleObject, UseThemeFunction> & { variant: string },
-    css = {}
-  ) {
-    if (sx) {
-      const { variant, ...baseStyles } = sx;
-      const variantStyles = cssx(get(theme, variant))({ theme });
+  const markdown = new MarkdownIt({
+    html: true,
+    breaks: true,
+    linkify: true,
+    typographer: true,
+  });
 
-      const mergedStyles = {
-        ...variantStyles,
-        ...cssx(baseStyles)({ theme }),
-        ...css,
-      };
+  const originalRenderAttrs = markdown.renderer.renderAttrs;
+  markdown.renderer.renderAttrs = function renderAttrs(token) {
+    if (token.tag) {
+      const styleVariant: string = `styles.${token.tag}`;
+      const className = applyStyles({ variant: styleVariant }, {}, theme);
 
-      return emotion.css(mergedStyles);
+      if (className) {
+        token.attrJoin('class', className);
+      }
     }
+    return originalRenderAttrs(token);
+  };
 
-    return undefined;
-  }
+  eleventyConfig.setLibrary('md', markdown);
 
   eleventyConfig.addTransform('theme-ui', function(
     content: string,
@@ -97,7 +121,8 @@ export default function plugin(
             variant: variantAttributeValue,
             ...sxAttributeValue,
           },
-          cssAttributeValue
+          cssAttributeValue,
+          theme
         );
 
         if (className) {
