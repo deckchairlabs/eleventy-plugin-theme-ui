@@ -17,14 +17,12 @@ const defaultStyles: SxProp = {
   borderRadius: 4,
 };
 
-export function Button(children: string, props: BoxProps) {
-  const as = props?.as || 'button';
-  const variant = props?.variant || 'primary';
-
-  return Box(children, {
+export function Button(props: BoxProps) {
+  return Box({
     ...props,
     sx: defaultStyles,
-    as,
-    variant,
+    as: props.as || 'button',
+    __themeKey: 'buttons',
+    variant: props.variant || 'primary',
   });
 }

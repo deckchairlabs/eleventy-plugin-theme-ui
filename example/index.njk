@@ -2,23 +2,27 @@
 <html>
   <head>
     <title>Page title</title>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.5.0/dist/alpine.min.js" defer></script>
   </head>
   <body>
-    <main class="{% sx {
+    {% Box as="main", sx={
       padding: [2, 4],
       backgroundColor: 'primary',
       color: 'white'
-    } %}">
-      Hello world!
-      <button class="{% variant 'buttons.primary' %}">Primary Button</button>
-      <button class="{% variant 'buttons.secondary' %}">Secondary Button</button>
+    } %}
+      <div class="{% sx { backgroundColor:'secondary' } %}">Hello world!</div>
+      
       {% Button variant="primary" %}
         Primary Button
       {% endButton %}
+      
+      {% Button variant="secondary" %}
+        Secondary Button
+      {% endButton %}
 
-      {% Box id="box" %}
+      {% Box variant="layout.main", sx={ padding: 6 } %}
         Box
       {% endBox %}
-    </main>
+    {% endBox %}
   </body>
 </html>

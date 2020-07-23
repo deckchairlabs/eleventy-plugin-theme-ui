@@ -40,14 +40,18 @@ export default function plugin(
     children: string,
     props: any
   ) {
-    return components.Box(children, { theme, ...props });
+    return components.Box({ children, theme, ...props });
   });
 
   eleventyConfig.addPairedShortcode('Button', function(
     children: string,
     props: any
   ) {
-    return components.Button(children, { theme, ...props });
+    return components.Button({ children, theme, ...props });
+  });
+
+  eleventyConfig.addShortcode('Close', function(props: any) {
+    return components.Close({ theme, ...props });
   });
 
   /**
