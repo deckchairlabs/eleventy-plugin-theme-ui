@@ -113,10 +113,7 @@ export default function plugin(
   const originalRenderAttrs = markdown.renderer.renderAttrs;
   markdown.renderer.renderAttrs = function renderAttrs(token) {
     if (token.tag) {
-      const className = css(
-        { __themeKey: 'styles', variant: token.tag },
-        theme
-      );
+      const className = css({ variant: `styles.${token.tag}` }, theme);
 
       if (className) {
         token.attrJoin('class', className);
