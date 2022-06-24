@@ -50,6 +50,6 @@
     "@types/theme-ui": "^0.3.5",
     "create-emotion-server": "^10.0.27",
     "emotion": "^10.0.27",
-    "jsdom": "^16.4.0"
+    "jsdom": "^16.5.0"
   }
 }
